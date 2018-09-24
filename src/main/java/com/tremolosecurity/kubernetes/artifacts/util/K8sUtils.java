@@ -48,6 +48,7 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.config.CookieSpecs;
 import org.apache.http.client.config.RequestConfig;
+import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
@@ -94,6 +95,11 @@ public class K8sUtils {
         File moreCerts = new File(pathToMoreCerts);
         if (moreCerts.exists() && moreCerts.isDirectory()) {
             for (File certFile : moreCerts.listFiles()) {
+                System.out.println("Processing - '" + certFile.getAbsolutePath() + "'");
+                if (certFile.isDirectory()) {
+                    System.out.println("not a pem, sipping");
+                    continue;
+                }
                 String certPem = new String(Files.readAllBytes(Paths.get(certFile.getAbsolutePath())), StandardCharsets.UTF_8);
                 String alias = certFile.getName().substring(0,certFile.getName().indexOf('.'));
                 CertUtils.importCertificate(ks, ksPassword, alias, certPem);
@@ -170,6 +176,31 @@ public class K8sUtils {
         HttpCon con = this.createClient();
         try {
 		    HttpResponse resp = con.getHttp().execute(get);
+		    String json = EntityUtils.toString(resp.getEntity());
+            Map ret = new HashMap();
+            ret.put("code",resp.getStatusLine().getStatusCode());
+            ret.put("data",json);
+            return ret;
+        } finally {
+            if (con != null) {
+				con.getBcm().shutdown();
+			}
+        }
+    }
+
+    public Map deleteWS(String uri) throws Exception {
+        
+        StringBuffer b = new StringBuffer();
+		
+		b.append(this.url).append(uri);
+		HttpDelete delete = new HttpDelete(b.toString());
+		b.setLength(0);
+		b.append("Bearer ").append(token);
+        delete.addHeader(new BasicHeader("Authorization","Bearer " + token));
+        
+        HttpCon con = this.createClient();
+        try {
+		    HttpResponse resp = con.getHttp().execute(delete);
 		    String json = EntityUtils.toString(resp.getEntity());
             Map ret = new HashMap();
             ret.put("code",resp.getStatusLine().getStatusCode());
