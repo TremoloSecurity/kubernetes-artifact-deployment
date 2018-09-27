@@ -18,9 +18,12 @@ import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
+import java.net.URLConnection;
+import java.nio.charset.StandardCharsets;
 import java.security.Security;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.script.ScriptContext;
 import javax.script.ScriptEngine;
@@ -49,6 +52,7 @@ public class RunDeployment {
         options.addOption("installScriptURL", true, "The url of the install javascript");
         options.addOption("secretsPath", true, "The path to the file containing all inputs");
         options.addOption("help", false, "Prints this message");
+        options.addOption("deploymentTemplate",true,"URL for the kubernetes deployment template to generate final deployment yaml");
 
         CommandLineParser parser = new DefaultParser();
 		CommandLine cmd = parser.parse(options, args,true);
@@ -63,6 +67,7 @@ public class RunDeployment {
             String kubernetesURL = loadOption(cmd, "kubernetesURL", options);
             String installScriptURL = loadOption(cmd,"installScriptURL",options);
             String secretsPath = loadOption(cmd, "secretsPath", options);
+            String deploymentTemplate = cmd.getOptionValue("deploymentTemplate");
             
             K8sUtils k8s = new K8sUtils(tokenPath,rootCaPath,extraCertsPath,kubernetesURL);
 
@@ -76,9 +81,20 @@ public class RunDeployment {
                 inputParams.put(name, val);
             }
 
+            String templateForDeployment = null;
+
+            if (deploymentTemplate != null) {
+                URL urlObj = new URL(deploymentTemplate);
+                URLConnection conn = urlObj.openConnection();
+                try (BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream(), StandardCharsets.UTF_8))) 
+                {
+                    templateForDeployment = reader.lines().collect(Collectors.joining("\n"));
+                }
+            }
 
             Security.addProvider(new BouncyCastleProvider());
             ScriptEngine engine = new ScriptEngineManager().getEngineByName("nashorn");
+            engine.getBindings(ScriptContext.ENGINE_SCOPE).put("deploymentTemplate", templateForDeployment);
             engine.getBindings(ScriptContext.ENGINE_SCOPE).put("k8s", k8s);
             engine.getBindings(ScriptContext.ENGINE_SCOPE).put("inProp", inputParams);
             URL scriptURL = new URL(installScriptURL);

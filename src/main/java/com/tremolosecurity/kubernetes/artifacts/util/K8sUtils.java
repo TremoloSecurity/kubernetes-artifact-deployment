@@ -15,11 +15,13 @@
 package com.tremolosecurity.kubernetes.artifacts.util;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -77,11 +79,13 @@ public class K8sUtils {
 	private Registry<ConnectionSocketFactory> httpClientRegistry;
     private RequestConfig globalHttpClientConfig;
     String url;
-
+    String pathToCaCert;
 
     public K8sUtils(String pathToToken,String pathToCA,String pathToMoreCerts,String apiServerURL) throws IOException, KeyStoreException, NoSuchAlgorithmException, CertificateException, UnrecoverableKeyException, KeyManagementException {
         //get the token for talking to k8s
         this.token = new String(Files.readAllBytes(Paths.get(pathToToken)), StandardCharsets.UTF_8);
+
+        this.pathToCaCert = pathToCA;
 
         this.ksPassword = UUID.randomUUID().toString();
         this.ks = KeyStore.getInstance("PKCS12");
@@ -279,6 +283,95 @@ public class K8sUtils {
         }
         vals = vals.substring(0,vals.length()-1);
         return Base64.getEncoder().encodeToString(vals.getBytes("UTF-8"));
+    }
+
+    public String processTemplate(String template,Map vars) {
+        StringBuffer newConfig = new StringBuffer();
+        newConfig.setLength(0);
+
+        int begin,end;
+
+
+        begin = 0;
+        end = 0;
+
+        String finalCfg = null;
+
+        begin = template.indexOf("#[");
+        while (begin > 0) {
+            if (end == 0) {
+                newConfig.append(template.substring(0,begin));
+            } else {
+                newConfig.append(template.substring(end,begin));
+            }
+
+            end = template.indexOf(']',begin + 2);
+
+            String envVarName = template.substring(begin + 2,end);
+            String value = (String) vars.get(envVarName);
+
+            if (value == null) {
+                value = "";
+            }
+
+            
+
+            newConfig.append(value);
+
+            begin = template.indexOf("#[",end + 1);
+            end++;
+        }
+
+        if (end != 0) {
+            newConfig.append(template.substring(end));
+        }
+
+        return newConfig.toString();
+    }
+
+    public void kubectlCreate(String data) throws IOException, InterruptedException {
+        Process p = Runtime.getRuntime().exec(new String[]{"kubectl","--token=" + this.token ,"--server=" + this.url ,"--certificate-authority=" + this.pathToCaCert ,"create","-f","-"});
+
+        new Thread() {
+            public void run() {
+                BufferedReader in = new BufferedReader(new InputStreamReader(p.getInputStream()));
+                String line;
+                try {
+                    while ((line = in.readLine()) != null) {
+                        System.out.println(line);
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }.start();
+
+        new Thread() {
+            public void run() {
+                BufferedReader in = new BufferedReader(new InputStreamReader(p.getErrorStream()));
+                String line;
+                try {
+                    while ((line = in.readLine()) != null) {
+                        System.err.println(line);
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }.start();
+
+        PrintStream out = new PrintStream(p.getOutputStream());
+        BufferedReader in = new BufferedReader(new InputStreamReader(new ByteArrayInputStream(data.getBytes("UTF-8"))));
+        String line;
+        while ((line = in.readLine()) != null) {
+            out.println(line);
+        }
+
+        out.close();
+        System.out.println("waiting for completion");
+
+        p.waitFor();
+
     }
     
 }
