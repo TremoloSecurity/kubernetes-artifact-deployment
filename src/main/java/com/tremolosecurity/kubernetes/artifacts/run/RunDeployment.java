@@ -97,6 +97,11 @@ public class RunDeployment {
             engine.getBindings(ScriptContext.ENGINE_SCOPE).put("deploymentTemplate", templateForDeployment);
             engine.getBindings(ScriptContext.ENGINE_SCOPE).put("k8s", k8s);
             engine.getBindings(ScriptContext.ENGINE_SCOPE).put("inProp", inputParams);
+
+
+            k8s.setEngine(engine);
+
+
             URL scriptURL = new URL(installScriptURL);
             engine.eval(new BufferedReader(new InputStreamReader(scriptURL.openStream())));
         }

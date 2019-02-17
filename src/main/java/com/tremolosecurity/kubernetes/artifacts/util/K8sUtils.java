@@ -42,6 +42,8 @@ import java.util.UUID;
 
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
+import javax.script.ScriptContext;
+import javax.script.ScriptEngine;
 
 import com.tremolosecurity.kubernetes.artifacts.obj.HttpCon;
 
@@ -81,6 +83,8 @@ public class K8sUtils {
     String url;
     String pathToCaCert;
 
+    ScriptEngine engine;
+
     public K8sUtils(String pathToToken,String pathToCA,String pathToMoreCerts,String apiServerURL) throws IOException, KeyStoreException, NoSuchAlgorithmException, CertificateException, UnrecoverableKeyException, KeyManagementException {
         //get the token for talking to k8s
         this.token = new String(Files.readAllBytes(Paths.get(pathToToken)), StandardCharsets.UTF_8);
@@ -100,7 +104,7 @@ public class K8sUtils {
         if (moreCerts.exists() && moreCerts.isDirectory()) {
             for (File certFile : moreCerts.listFiles()) {
                 System.out.println("Processing - '" + certFile.getAbsolutePath() + "'");
-                if (certFile.isDirectory()) {
+                if (certFile.isDirectory() || ! certFile.getAbsolutePath().toLowerCase().endsWith(".pem")) {
                     System.out.println("not a pem, sipping");
                     continue;
                 }
@@ -167,7 +171,12 @@ public class K8sUtils {
 
 	}
 
+
     public Map callWS(String uri) throws Exception {
+        return callWS(uri,null,10);
+    }
+
+    public Map callWS(String uri,String testFunction,int count) throws Exception {
         
         StringBuffer b = new StringBuffer();
 		
@@ -184,6 +193,52 @@ public class K8sUtils {
             Map ret = new HashMap();
             ret.put("code",resp.getStatusLine().getStatusCode());
             ret.put("data",json);
+
+            if (resp.getStatusLine().getStatusCode() < 200 || resp.getStatusLine().getStatusCode() > 299) {
+                System.err.println("Problem calling '" + uri + "' - " + resp.getStatusLine().getStatusCode());
+                System.err.println(json);
+
+                if (count > 0) {
+                    System.err.println("Sleeping, then trying again");
+                    Thread.sleep(10000);
+                    System.err.println("trying again");
+                    return callWS(uri, testFunction, --count);
+
+                }
+            }
+
+            if (testFunction != null) {
+                engine.getBindings(ScriptContext.ENGINE_SCOPE).put("check_ws_response",false);
+                engine.getBindings(ScriptContext.ENGINE_SCOPE).put("ws_response_json",json);
+
+                
+                try {
+                    engine.eval(testFunction);
+                } catch (Throwable t) {
+                    System.err.println("Unable to verify '" + uri + "' / " + json);
+                    t.printStackTrace();
+                    if (count > 0) {
+                        System.err.println("Sleeping, then trying again");
+                        Thread.sleep(10000);
+                        System.err.println("trying again");
+                        return callWS(uri, testFunction, --count);
+    
+                    }
+                }
+
+                if (! ((Boolean) engine.getBindings(ScriptContext.ENGINE_SCOPE).get("check_ws_response"))) {
+                    System.err.println("Verification for '" + uri + "' failed / " + json);
+                    if (count > 0) {
+                        System.err.println("Sleeping, then trying again");
+                        Thread.sleep(10000);
+                        System.err.println("trying again");
+                        return callWS(uri, testFunction, --count);
+    
+                    }
+                }
+            }
+
+
             return ret;
         } finally {
             if (con != null) {
@@ -209,6 +264,12 @@ public class K8sUtils {
             Map ret = new HashMap();
             ret.put("code",resp.getStatusLine().getStatusCode());
             ret.put("data",json);
+
+            if (resp.getStatusLine().getStatusCode() < 200 || resp.getStatusLine().getStatusCode() > 299) {
+                System.err.println("Problem calling '" + uri + "' - " + resp.getStatusLine().getStatusCode());
+                System.err.println(json);
+            }
+
             return ret;
         } finally {
             if (con != null) {
@@ -236,6 +297,12 @@ public class K8sUtils {
             Map ret = new HashMap();
             ret.put("code",resp.getStatusLine().getStatusCode());
             ret.put("data",jsonResponse);
+
+            if (resp.getStatusLine().getStatusCode() < 200 || resp.getStatusLine().getStatusCode() > 299) {
+                System.err.println("Problem calling '" + uri + "' - " + resp.getStatusLine().getStatusCode());
+                System.err.println(json);
+            }
+
             return ret;
         } finally {
             if (con != null) {
@@ -263,6 +330,13 @@ public class K8sUtils {
             Map ret = new HashMap();
             ret.put("code",resp.getStatusLine().getStatusCode());
             ret.put("data",jsonResponse);
+
+
+            if (resp.getStatusLine().getStatusCode() < 200 || resp.getStatusLine().getStatusCode() > 299) {
+                System.err.println("Problem calling '" + uri + "' - " + resp.getStatusLine().getStatusCode());
+                System.err.println(json);
+            }
+
             return ret;
         } finally {
             if (con != null) {
@@ -372,6 +446,20 @@ public class K8sUtils {
 
         p.waitFor();
 
+    }
+
+    /**
+     * @param engine the engine to set
+     */
+    public void setEngine(ScriptEngine engine) {
+        this.engine = engine;
+    }
+
+    /**
+     * @return the engine
+     */
+    public ScriptEngine getEngine() {
+        return engine;
     }
     
 }

@@ -166,6 +166,18 @@ public class CertUtils {
         return b64;
     }
 
+
+    public static X509Certificate string2cert(String b64Cert) throws Exception {
+        //System.out.println(b64Cert);
+        //System.out.println("");
+        b64Cert = b64Cert.replace("\n", "");
+        //System.out.println(b64Cert);
+        ByteArrayInputStream bais = new ByteArrayInputStream(Base64.decodeBase64(b64Cert));
+        CertificateFactory cf = CertificateFactory.getInstance("X.509");
+        Collection<? extends java.security.cert.Certificate> c = cf.generateCertificates(bais);
+        return (X509Certificate) c.iterator().next();
+    }
+
     public static String exportCert(X509Certificate cert) throws Exception {
 		
 		Base64 encoder = new Base64(64);

@@ -15,7 +15,7 @@ RUN apt-get update;apt-get -y install openjdk-8-jdk-headless curl apt-transport-
     groupadd -r artifactdeploy -g 433 && \
     mkdir /usr/local/artifactdeploy && \
     useradd -u 431 -r -g artifactdeploy -d /usr/local/artifactdeploy -s /sbin/nologin -c "Artifact Deployment Docker image user" artifactdeploy && \
-    curl https://www.tremolosecurity.com/nexus/service/local/repositories/releases/content/com/tremolosecurity/kubernetes/artifact-deployment/$ARTIFACT_DEPLOY_VERSION/artifact-deployment-$ARTIFACT_DEPLOY_VERSION.jar -o /usr/local/artifactdeploy/artifact-deploy.jar && \
+    curl https://nexus.tremolo.io/repository/releases/com/tremolosecurity/kubernetes/artifact-deployment/$ARTIFACT_DEPLOY_VERSION/artifact-deployment-$ARTIFACT_DEPLOY_VERSION.jar -o /usr/local/artifactdeploy/artifact-deploy.jar && \
     chown -R artifactdeploy:artifactdeploy /usr/local/artifactdeploy 
 
 USER 431
