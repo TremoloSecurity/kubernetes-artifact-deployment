@@ -10,30 +10,12 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.tremolosecurity.kubernetes</groupId>
 	<artifactId>artifact-deployment</artifactId>
-	<version>1.0.0</version>
+	<version>1.1.0</version>
 	<name>artifact-deployment</name>
 	<packaging>jar</packaging>
 
 	<properties>
-		<commons-collections.version>3.2.2</commons-collections.version>
-		<commons-cli.version>1.4</commons-cli.version>
-		<xerces.version>2.12.0</xerces.version>
-		<bcprov-jdk15on.version>1.61</bcprov-jdk15on.version>
-		<bcprov-ext-jdk15on.version>1.61</bcprov-ext-jdk15on.version>
-		<log4j.version>2.11.0</log4j.version>
-		<bcpkix-jdk15on.version>1.61</bcpkix-jdk15on.version>
-		<xmlsec.version>2.0.5</xmlsec.version>
-		<joda-time.version>2.10.1</joda-time.version>
-		<commons-codec.version>1.12</commons-codec.version>
-		<httpclient.version>4.5.7</httpclient.version>
-		<httpcore.version>4.4.11</httpcore.version>
-		<httpmime.version>4.5.7</httpmime.version>
-		<jackson.version>2.9.8</jackson.version>
-		<commons-cli.version>1.4</commons-cli.version>
-		<mariadb.version>2.4.0</mariadb.version>
-		<mysql.version>8.0.15</mysql.version>
-		<mssql.version>7.2.1.jre8</mssql.version>
-		<commonsio.version>2.6</commonsio.version>
+		<kubernetes-operator-version>1.0.0</kubernetes-operator-version>
 	</properties>
 
 	<repositories>
@@ -44,7 +26,7 @@
 		<repository>
 			<id>nexus.tremolo.io</id>
 			<name>tremolo.io-releases</name>
-			<url>https://nexus.tremolo.io/repository/betas/</url>
+			<url>https://nexus.tremolo.io/repository/releases/</url>
 		</repository>
 
 
@@ -73,77 +55,12 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>joda-time</groupId>
-			<artifactId>joda-time</artifactId>
-			<version>${joda-time.version}</version>
+			<groupId>com.tremolosecurity.kubernetes</groupId>
+	<artifactId>javascript-operator</artifactId>
+	<version>${kubernetes-operator-version}</version>
+	
 		</dependency>
-		<dependency>
-			<groupId>org.bouncycastle</groupId>
-			<artifactId>bcprov-jdk15on</artifactId>
-			<version>${bcprov-jdk15on.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.bouncycastle</groupId>
-			<artifactId>bcprov-ext-jdk15on</artifactId>
-			<version>${bcprov-ext-jdk15on.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.bouncycastle</groupId>
-			<artifactId>bcpkix-jdk15on</artifactId>
-			<version>${bcprov-ext-jdk15on.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>commons-codec</groupId>
-			<artifactId>commons-codec</artifactId>
-			<version>${commons-codec.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.httpcomponents</groupId>
-			<artifactId>httpclient</artifactId>
-			<version>${httpclient.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.httpcomponents</groupId>
-			<artifactId>httpcore</artifactId>
-			<version>${httpcore.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.httpcomponents</groupId>
-			<artifactId>httpmime</artifactId>
-			<version>${httpmime.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>com.fasterxml.jackson.core</groupId>
-  			<artifactId>jackson-databind</artifactId>
-			<version>${jackson.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>commons-cli</groupId>
-			<artifactId>commons-cli</artifactId>
-			<version>${commons-cli.version}</version>
-		</dependency>
-		<dependency> 
-		<groupId>org.mariadb.jdbc</groupId>
-		<artifactId>mariadb-java-client</artifactId>
-		<version>${mariadb.version}</version>
-		</dependency>
-
-		<dependency>
-		<groupId>mysql</groupId>
-		<artifactId>mysql-connector-java</artifactId>
-		<version>${mysql.version}</version>
-		</dependency>
-
-		<dependency>
-			<groupId>com.microsoft.sqlserver</groupId>
-			<artifactId>mssql-jdbc</artifactId>
-			<version>${mssql.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>commons-io</groupId>
-			<artifactId>commons-io</artifactId>
-			<version>${commonsio.version}</version>
-		</dependency>
+		
 	</dependencies>
 	<build>
 		<plugins>

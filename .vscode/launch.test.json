@@ -1,0 +1,30 @@
+{
+    "run": {
+        "default": "",
+        "items": [
+            {
+                "name": "artifact-deployment",
+                "projectName": "artifact-deployment",
+                "workingDirectory": "/Users/mlb/git/kubernetes-artifact-deployment",
+                "args": [],
+                "vmargs": [],
+                "env": {},
+                "preLaunchTask": ""
+            }
+        ]
+    },
+    "debug": {
+        "default": "",
+        "items": [
+            {
+                "name": "artifact-deployment",
+                "projectName": "artifact-deployment",
+                "workingDirectory": "/Users/mlb/git/kubernetes-artifact-deployment",
+                "args": [],
+                "vmargs": [],
+                "env": {},
+                "preLaunchTask": ""
+            }
+        ]
+    }
+}

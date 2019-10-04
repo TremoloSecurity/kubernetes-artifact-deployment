@@ -3,7 +3,7 @@ FROM ubuntu:18.04
 MAINTAINER Tremolo Security, Inc. - Docker <docker@tremolosecurity.com>
 
 ENV JDK_VERSION=1.8.0 \
-    ARTIFACT_DEPLOY_VERSION=1.0.0 
+    ARTIFACT_DEPLOY_VERSION=1.1.0 
 
 LABEL io.k8s.description="Platform for deploying kubernetes artifacts" \
       io.k8s.display-name="Kubernetes Artifact Deployer" 
