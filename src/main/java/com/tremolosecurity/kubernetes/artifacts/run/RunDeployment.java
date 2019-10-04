@@ -30,6 +30,7 @@ import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 
 import com.tremolosecurity.kubernetes.artifacts.util.K8sUtils;
+import com.tremolosecurity.kubernetes.artifacts.util.NetUtil;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -64,21 +65,36 @@ public class RunDeployment {
             String tokenPath = loadOption(cmd, "tokenPath", options);
             String rootCaPath = loadOption(cmd,"rootCaPath",options);
             String extraCertsPath = loadOption(cmd, "extraCertsPath", options);
+            String nonSecretPropsPath = extraCertsPath + "/input.props";
             String kubernetesURL = loadOption(cmd, "kubernetesURL", options);
             String installScriptURL = loadOption(cmd,"installScriptURL",options);
             String secretsPath = loadOption(cmd, "secretsPath", options);
             String deploymentTemplate = cmd.getOptionValue("deploymentTemplate");
             
+            NetUtil.initialize(extraCertsPath);
             K8sUtils k8s = new K8sUtils(tokenPath,rootCaPath,extraCertsPath,kubernetesURL);
 
             Map<String,String> inputParams = new HashMap<String,String>();
+            Map<String,String> nonSecretParams = new HashMap<String,String>();
 
             BufferedReader in = new BufferedReader(new InputStreamReader(new FileInputStream(secretsPath)));
             String line;
             while ((line = in.readLine()) != null) {
-                String name = line.substring(0,line.indexOf('='));
-                String val = line.substring(line.indexOf('=') + 1);
-                inputParams.put(name, val);
+                if (line.indexOf('=') > 0) {
+                    String name = line.substring(0,line.indexOf('='));
+                    String val = line.substring(line.indexOf('=') + 1);
+                    inputParams.put(name, val);
+                }
+            }
+
+            in = new BufferedReader(new InputStreamReader(new FileInputStream(nonSecretPropsPath)));
+            
+            while ((line = in.readLine()) != null) {
+                if (line.indexOf('=') > 0) {
+                    String name = line.substring(0,line.indexOf('='));
+                    String val = line.substring(line.indexOf('=') + 1);
+                    nonSecretParams.put(name, val);
+                }
             }
 
             String templateForDeployment = null;
@@ -97,7 +113,8 @@ public class RunDeployment {
             engine.getBindings(ScriptContext.ENGINE_SCOPE).put("deploymentTemplate", templateForDeployment);
             engine.getBindings(ScriptContext.ENGINE_SCOPE).put("k8s", k8s);
             engine.getBindings(ScriptContext.ENGINE_SCOPE).put("inProp", inputParams);
-
+            engine.getBindings(ScriptContext.ENGINE_SCOPE).put("nonSecretInProp", nonSecretParams);
+            engine.getBindings(ScriptContext.ENGINE_SCOPE).put("configMapsDir",extraCertsPath);
 
             k8s.setEngine(engine);
 
