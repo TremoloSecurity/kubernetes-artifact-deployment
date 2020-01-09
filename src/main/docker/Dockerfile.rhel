@@ -1,0 +1,33 @@
+FROM registry.access.redhat.com/ubi8/ubi:latest
+
+MAINTAINER Tremolo Security, Inc. - Docker <docker@tremolosecurity.com>
+
+ENV JDK_VERSION=1.8.0 \
+    ARTIFACT_DEPLOY_VERSION=1.1.0 
+
+LABEL name="Kubernetes Artifact Deployer" \
+      vendor="Tremolo Security, Inc." \
+      version="1.0.0" \
+      release="20200108" \
+      url="https://www.tremolosecurity.com/" \
+      summary="Artifact deployment image" \
+      description="Tool for running javascript based deployments for more flexability" \
+      io.k8s.description="Kubernetes Artifact Deployment" \
+      io.k8s.display-name="Kubernetes Artifact Deployer" \
+      io.openshift.expose-services="" \
+      io.openshift.tags="javascript"
+
+RUN yum -y install curl java-1.8.0-openjdk-headless.x86_64 wget unzip;yum -y upgrade;yum clean all && \
+    groupadd -r artifactdeploy -g 433 && \
+    mkdir /usr/local/artifactdeploy && \
+    useradd -u 431 -r -g artifactdeploy -d /usr/local/artifactdeploy -s /sbin/nologin -c "Artifact Deployment Docker image user" artifactdeploy && \
+    curl https://nexus.tremolo.io/repository/releases/com/tremolosecurity/kubernetes/artifact-deployment/$ARTIFACT_DEPLOY_VERSION/artifact-deployment-$ARTIFACT_DEPLOY_VERSION.jar -o /usr/local/artifactdeploy/artifact-deploy.jar && \
+    chown -R artifactdeploy:artifactdeploy /usr/local/artifactdeploy && \
+    mkdir /licenses && \
+    rm -rf /var/cache/yum
+
+COPY LICENSE /licenses
+
+USER 431
+
+CMD ["/usr/bin/java", "-jar", "/usr/local/artifactdeploy/artifact-deploy.jar"]
