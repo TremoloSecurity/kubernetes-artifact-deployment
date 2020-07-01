@@ -31,7 +31,7 @@
 		<jackson.version>2.9.8</jackson.version>
 		<commons-cli.version>1.4</commons-cli.version>
 		<mariadb.version>2.4.0</mariadb.version>
-		<mysql.version>8.0.15</mysql.version>
+		<mysql.version>8.0.16</mysql.version>
 		<mssql.version>7.2.1.jre8</mssql.version>
 		<commonsio.version>2.6</commonsio.version>
 	</properties>
