@@ -33,7 +33,7 @@
 		<mariadb.version>2.4.0</mariadb.version>
 		<mysql.version>8.0.15</mysql.version>
 		<mssql.version>7.2.1.jre8</mssql.version>
-		<commonsio.version>2.6</commonsio.version>
+		<commonsio.version>2.7</commonsio.version>
 	</properties>
 
 	<repositories>
