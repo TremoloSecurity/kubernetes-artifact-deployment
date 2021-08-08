@@ -31,6 +31,8 @@
 		<httpmime.version>4.5.5</httpmime.version>
 		<jackson.version>2.9.6</jackson.version>
 		<commons-cli.version>1.4</commons-cli.version>
+		<mariadb.version>2.3.0</mariadb.version>
+		<mysql.version>8.0.12</mysql.version>
 	</properties>
 
 	<repositories>
@@ -122,13 +124,17 @@
 			<artifactId>commons-cli</artifactId>
 			<version>${commons-cli.version}</version>
 		</dependency>
+		<dependency> 
+		<groupId>org.mariadb.jdbc</groupId>
+		<artifactId>mariadb-java-client</artifactId>
+		<version>${mariadb.version}</version>
+		</dependency>
 
 		<dependency>
-    <groupId>io.kubernetes</groupId>
-    <artifactId>client-java</artifactId>
-    <version>2.0.0-beta1</version>
-    <scope>compile</scope>
-</dependency>
+		<groupId>mysql</groupId>
+		<artifactId>mysql-connector-java</artifactId>
+		<version>${mysql.version}</version>
+		</dependency>
 	</dependencies>
 	<build>
 		<plugins>
