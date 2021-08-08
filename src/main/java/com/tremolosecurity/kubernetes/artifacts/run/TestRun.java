@@ -36,23 +36,26 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider;
 public class TestRun {
 
     public static void main(String[] args) throws Exception {
-        K8sUtils k8s = new K8sUtils(System.getenv("pathtotoken"),System.getenv("pathtopem"),System.getenv("pathtoextrajs"),System.getenv("k8surl"));
+        /*K8sUtils k8s = new K8sUtils("/home/mlb/tmp/k8s/token","/home/mlb/tmp/k8s/master.pem","/home/mlb/tmp/k8s/extracerts","https://k8s-installer-master.tremolo.lan:6443");
 
         Map<String,String> inputParams = new HashMap<String,String>();
 
-        BufferedReader in = new BufferedReader(new InputStreamReader(new FileInputStream(System.getenv("pathtoprops"))));
+        BufferedReader in = new BufferedReader(new InputStreamReader(new FileInputStream("/home/mlb/tmp/k8s/props")));
         String line;
         while ((line = in.readLine()) != null) {
             String name = line.substring(0,line.indexOf('='));
             String val = line.substring(line.indexOf('=') + 1);
             inputParams.put(name, val);
-        }
+        }*/
+
 
 
         Security.addProvider(new BouncyCastleProvider());
         ScriptEngine engine = new ScriptEngineManager().getEngineByName("nashorn");
-        engine.getBindings(ScriptContext.ENGINE_SCOPE).put("k8s", k8s);
-        engine.getBindings(ScriptContext.ENGINE_SCOPE).put("inProp", inputParams);
-        engine.eval(new FileReader(System.getenv("pathtodeployjs")));
+        //engine.getBindings(ScriptContext.ENGINE_SCOPE).put("k8s", k8s);
+        //engine.getBindings(ScriptContext.ENGINE_SCOPE).put("inProp", inputParams);
+        engine.eval(new FileReader("/Users/mlb/Documents/testxml.js"));
+
+        
     }
 }

@@ -17,33 +17,34 @@
 	<properties>
 		<commons-collections.version>3.2.2</commons-collections.version>
 		<commons-cli.version>1.4</commons-cli.version>
-		<opensaml.version>3.3.1</opensaml.version>
 		<xerces.version>2.12.0</xerces.version>
-		<bcprov-jdk15on.version>1.60</bcprov-jdk15on.version>
-		<bcprov-ext-jdk15on.version>1.60</bcprov-ext-jdk15on.version>
+		<bcprov-jdk15on.version>1.61</bcprov-jdk15on.version>
+		<bcprov-ext-jdk15on.version>1.61</bcprov-ext-jdk15on.version>
 		<log4j.version>2.11.0</log4j.version>
-		<bcpkix-jdk15on.version>1.60</bcpkix-jdk15on.version>
+		<bcpkix-jdk15on.version>1.61</bcpkix-jdk15on.version>
 		<xmlsec.version>2.0.5</xmlsec.version>
-		<joda-time.version>2.10</joda-time.version>
-		<commons-codec.version>1.11</commons-codec.version>
-		<httpclient.version>4.5.5</httpclient.version>
-		<httpcore.version>4.4.10</httpcore.version>
-		<httpmime.version>4.5.5</httpmime.version>
-		<jackson.version>2.9.6</jackson.version>
+		<joda-time.version>2.10.1</joda-time.version>
+		<commons-codec.version>1.12</commons-codec.version>
+		<httpclient.version>4.5.7</httpclient.version>
+		<httpcore.version>4.4.11</httpcore.version>
+		<httpmime.version>4.5.7</httpmime.version>
+		<jackson.version>2.9.8</jackson.version>
 		<commons-cli.version>1.4</commons-cli.version>
-		<mariadb.version>2.3.0</mariadb.version>
-		<mysql.version>8.0.12</mysql.version>
+		<mariadb.version>2.4.0</mariadb.version>
+		<mysql.version>8.0.15</mysql.version>
+		<mssql.version>7.2.1.jre8</mssql.version>
+		<commonsio.version>2.6</commonsio.version>
 	</properties>
 
 	<repositories>
 		<repository>
 			<id>tremolosecurity-dependencies</id>
-			<url>https://www.tremolosecurity.com/nexus/content/repositories/dependencies/</url>
+			<url>https://nexus.tremolo.io/repository/dependencies/</url>
 		</repository>
 		<repository>
-			<id>deployment</id>
-			<name>Tremolo Security Releases</name>
-			<url>https://www.tremolosecurity.com/nexus/content/repositories/releases/</url>
+			<id>nexus.tremolo.io</id>
+			<name>tremolo.io-releases</name>
+			<url>https://nexus.tremolo.io/repository/betas/</url>
 		</repository>
 
 
@@ -52,18 +53,15 @@
 			<url>https://repository.jboss.org/nexus/content/repositories/</url>
 		</repository>  -->
 
-		<repository>
-			<id>opensaml</id>
-			<url>https://build.shibboleth.net/nexus/content/repositories/releases/</url>
-		</repository>
+
 
 	</repositories>
 
 	<distributionManagement>
 		<repository>
-			<id>deployment</id>
-			<name>Tremolo Security Releases</name>
-			<url>https://www.tremolosecurity.com/nexus/content/repositories/releases</url>
+			<id>nexus.tremolo.io</id>
+			<name>tremolo.io-releases</name>
+			<url>https://nexus.tremolo.io/repository/releases/</url>
 		</repository>
 
 	</distributionManagement>
@@ -134,6 +132,17 @@
 		<groupId>mysql</groupId>
 		<artifactId>mysql-connector-java</artifactId>
 		<version>${mysql.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.microsoft.sqlserver</groupId>
+			<artifactId>mssql-jdbc</artifactId>
+			<version>${mssql.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+			<version>${commonsio.version}</version>
 		</dependency>
 	</dependencies>
 	<build>
